@@ -6,18 +6,17 @@ install:
 
 # Run the main script
 run:
-	uv pip install -e .
-	python cursor_chat_history.py
+	uv run python cursor_chat_history.py
 
 # Lint the code using ruff
 lint:
-	ruff .
+	uv run ruff .
 
 # Run unit tests with pytest
 test:
 	PYTHONPATH=. uv run pytest tests/
 
-# Clean up cache and export directories
+# Clean up cache and export directories, and auto-fix lint
 clean:
 	rm -rf __pycache__ .ruff_cache chat_history_exports
-	ruff check --fix .
+	uv run ruff check --fix .

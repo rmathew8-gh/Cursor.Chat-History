@@ -56,7 +56,7 @@ class CursorChatHistoryExporter:
     @staticmethod
     def export_prompts_to_org(prompts: Iterable[Prompt], output_file: Path) -> None:
         with open(output_file, "w", encoding="utf-8") as f:
-            f.writelines(f"* {prompt.text.replace('\n', '\n')}\n" for prompt in prompts)
+            f.writelines(f"* {prompt.text}\n" for prompt in prompts)
 
     @staticmethod
     def parse_prompts(raw_prompts: Any) -> Optional[List[Prompt]]:
