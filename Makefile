@@ -6,7 +6,8 @@ install:
 
 # Run the main script
 run:
-	uv pip install -e . && uv python cursor_chat_history.py
+	uv pip install -e .
+	python cursor_chat_history.py
 
 # Lint the code using ruff
 lint:
