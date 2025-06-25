@@ -1,0 +1,13 @@
+[project]
+name = "cursor_chat_history"
+version = "0.1.0"
+description = "Tools for exporting and managing Cursor AI chat history."
+authors = ["Your Name <your.email@example.com>"]
+requires-python = ">=3.8"
+dependencies = [
+    "duckdb",
+    "ruff"
+]
+
+[tool.uv]
+# uv-specific configuration can go here if needed
