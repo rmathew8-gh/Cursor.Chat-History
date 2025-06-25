@@ -1,10 +1,5 @@
 #+setupfile: ~/.org-mode-goodies/setup.org
 
-#+TITLE: Cursor Chat History Exporter
-#+AUTHOR: Roy
-#+DATE: <2024-06-13>
-#+OPTIONS: toc:t
-
 * Cursor Chat History Exporter
 
 This project provides tools to extract and export AI service prompts from Cursor's workspace history databases. It is designed for users who want to analyze or archive their chat history from the Cursor editor.
