@@ -5,32 +5,49 @@ from pathlib import Path
 import os
 import sys
 import logging
-from typing import List, Optional, Dict, Any, Callable, Iterable
-from functools import partial
+from typing import List, Optional, Dict, Any, Iterable
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True)
 class Prompt:
     text: str
     # Add more fields if needed
 
+
 class CursorChatHistoryExporter:
-    def __init__(self, base_dir: Optional[str] = None, output_dir: str = "chat_history_exports"):
-        self.base_dir = base_dir or str(Path(os.path.expanduser("~")) / ".config/Cursor/User/workspaceStorage")
+    def __init__(
+        self, base_dir: Optional[str] = None, output_dir: str = "chat_history_exports"
+    ):
+        if base_dir is not None:
+            self.base_dir = base_dir
+        else:
+            if sys.platform == "darwin":
+                # macOS default path
+                self.base_dir = str(
+                    Path(os.path.expanduser("~")) / "Library/Application Support/Cursor/User/workspaceStorage"
+                )
+            else:
+                # Linux/Windows default path
+                self.base_dir = str(
+                    Path(os.path.expanduser("~")) / ".config/Cursor/User/workspaceStorage"
+                )
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
 
     @staticmethod
     def find_vscdb_files(base_dir: str) -> List[Path]:
         """Recursively find all state.vscdb files in subdirectories of base_dir."""
-        return list(Path(base_dir).rglob('state.vscdb'))
+        return list(Path(base_dir).rglob("state.vscdb"))
 
     @staticmethod
     def get_table_names(db_path: Path) -> List[str]:
         try:
-            with duckdb.connect(database=':memory:') as con:
+            with duckdb.connect(database=":memory:") as con:
                 con.execute(f"ATTACH DATABASE '{db_path}' AS db;")
-                tables = con.execute("SELECT name FROM main.sqlite_master WHERE type='table';").fetchall()
+                tables = con.execute(
+                    "SELECT name FROM main.sqlite_master WHERE type='table';"
+                ).fetchall()
                 return [t[0] for t in tables]
         except Exception as e:
             logging.error(f"Error reading tables from {db_path}: {e}")
@@ -38,7 +55,7 @@ class CursorChatHistoryExporter:
 
     @staticmethod
     def export_prompts_to_org(prompts: Iterable[Prompt], output_file: Path) -> None:
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             f.writelines(f"* {prompt.text.replace('\n', '\n')}\n" for prompt in prompts)
 
     @staticmethod
@@ -47,8 +64,11 @@ class CursorChatHistoryExporter:
             # Use map and filter to process prompts
             return list(
                 map(
-                    lambda entry: Prompt(text=entry.get('text', '')),
-                    filter(lambda entry: isinstance(entry, dict) and 'text' in entry, raw_prompts)
+                    lambda entry: Prompt(text=entry.get("text", "")),
+                    filter(
+                        lambda entry: isinstance(entry, dict) and "text" in entry,
+                        raw_prompts,
+                    ),
                 )
             )
         return None
@@ -56,12 +76,16 @@ class CursorChatHistoryExporter:
     @staticmethod
     def extract_ai_service_prompts(db_path: Path) -> Optional[List[Dict[str, Any]]]:
         try:
-            with duckdb.connect(database=':memory:') as con:
+            with duckdb.connect(database=":memory:") as con:
                 con.execute(f"ATTACH DATABASE '{db_path}' AS db;")
-                tables = con.execute("SELECT name FROM main.sqlite_master WHERE type='table';").fetchall()
-                if not any(t[0] == 'ItemTable' for t in tables):
+                tables = con.execute(
+                    "SELECT name FROM main.sqlite_master WHERE type='table';"
+                ).fetchall()
+                if not any(t[0] == "ItemTable" for t in tables):
                     return None
-                row = con.execute("SELECT value FROM db.ItemTable WHERE key='aiService.prompts';").fetchone()
+                row = con.execute(
+                    "SELECT value FROM db.ItemTable WHERE key='aiService.prompts';"
+                ).fetchone()
                 if not row:
                     return None
                 value = row[0]
@@ -100,19 +124,23 @@ class CursorChatHistoryExporter:
             logging.info(f"Running in single-file mode on {single_file}")
         else:
             vscdb_files = self.find_vscdb_files(self.base_dir)
-            logging.info(f"Running in multi-workspace mode, found {len(vscdb_files)} files.")
+            logging.info(
+                f"Running in multi-workspace mode, found {len(vscdb_files)} files."
+            )
         if not vscdb_files:
             logging.warning("No .vscdb files found.")
             return
         # Use functional style to process all db files
         list(map(process_db, vscdb_files))
 
+
 def extract_ai_service_prompts(db_path: Path) -> Optional[List[Dict[str, Any]]]:
     """Module-level function for backward compatibility with tests."""
     return CursorChatHistoryExporter.extract_ai_service_prompts(db_path)
 
+
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     exporter = CursorChatHistoryExporter()
     if len(sys.argv) > 1:
         db_path = Path(sys.argv[1])
@@ -120,5 +148,6 @@ def main() -> None:
     else:
         exporter.export_all()
 
+
 if __name__ == "__main__":
-    main() 
+    main()

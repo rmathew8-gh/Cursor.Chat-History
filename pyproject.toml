@@ -13,3 +13,8 @@ dependencies = [
 
 [tool.uv]
 # uv-specific configuration can go here if needed
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cursor_chat_history*"]
+exclude = ["chat_history_exports*"]

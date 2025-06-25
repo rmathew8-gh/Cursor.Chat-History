@@ -2,7 +2,7 @@
 
 # Install dependencies using uv
 install:
-	uv pip install -r requirements.txt
+	uv pip install -e .
 
 # Run the main script
 run:
@@ -15,8 +15,9 @@ lint:
 
 # Run unit tests with pytest
 test:
-	uv pip install pytest && pytest tests/
+	PYTHONPATH=. uv run pytest tests/
 
 # Clean up cache and export directories
 clean:
-	rm -rf __pycache__ .ruff_cache chat_history_exports 
+	rm -rf __pycache__ .ruff_cache chat_history_exports
+	ruff check --fix .

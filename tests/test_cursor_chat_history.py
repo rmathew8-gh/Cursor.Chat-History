@@ -1,4 +1,3 @@
-import pytest
 from pathlib import Path
 from cursor_chat_history import extract_ai_service_prompts
 
