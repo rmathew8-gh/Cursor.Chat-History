@@ -1,0 +1,63 @@
+#+setupfile: ~/.org-mode-goodies/setup.org
+
+#+TITLE: Cursor Chat History Exporter
+#+AUTHOR: Roy
+#+DATE: <2024-06-13>
+#+OPTIONS: toc:t
+
+* Cursor Chat History Exporter
+
+This project provides tools to extract and export AI service prompts from Cursor's workspace history databases. It is designed for users who want to analyze or archive their chat history from the Cursor editor.
+
+* Features
+- Recursively finds all ~state.vscdb~ files in Cursor workspace storage
+- Extracts ~aiService.prompts~ from each database
+- Exports prompts to Org-mode files for easy reading and organization
+- Supports both multi-workspace and single-file modes
+- Functional and class-based Python code with modern best practices
+
+* Requirements
+- Python 3.8+
+- ~duckdb~
+- ~pytest~ (for running tests)
+- ~uv~ (for dependency management, optional)
+
+* Installation
+#+BEGIN_SRC shell
+uv pip install -e .
+#+END_SRC
+
+* Usage
+** Export All Workspace Prompts
+#+BEGIN_SRC shell
+make run
+#+END_SRC
+This will:
+- Install the package in editable mode
+- Run the exporter, which scans all Cursor workspaceStorage directories and exports prompts to ~chat_history_exports/*.org~
+
+** Export Prompts from a Specific File
+#+BEGIN_SRC shell
+python cursor_chat_history.py /path/to/state.vscdb
+#+END_SRC
+
+* Testing
+Run the test suite with:
+#+BEGIN_SRC shell
+make test
+#+END_SRC
+
+* Project Structure
+- ~cursor_chat_history.py~ :: Main script and library
+- ~tests/~ :: Unit tests
+- ~chat_history_exports/~ :: Output directory for exported Org files
+
+* Example Output
+Each exported Org file will contain entries like:
+#+BEGIN_EXAMPLE
+* What is the capital of France?
+* Summarize this article.
+#+END_EXAMPLE
+
+* License
+MIT License (see LICENSE file) 
