@@ -10,8 +10,8 @@ This project provides tools to extract and export AI service prompts from Cursor
 * Quickstart
 
 #+BEGIN_SRC shell
-git clone <repo-url>
-cd Cursor.AI
+git clone <repo-url> Cursor.Chat-History
+cd Cursor.Chat-History
 make install
 make run
 #+END_SRC
