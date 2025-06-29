@@ -1,0 +1,27 @@
+#+setupfile: ~/.org-mode-goodies/setup.org
+
+* Python (Kafka, Async, Schema, Testing)
+  - Create a Python Kafka producer that reads messages from a topic named {topic_name}. Use the latest Kafka client (kraft, not zookeeper). Ensure it connects using IPv4 only. Place the code in {project_dir}. Add a script to dump stats about all Kafka queues and print a one-line excerpt of each message in a topic.
+  - Rewrite the Kafka consumer code using async/await. Support two consumer groups: one reads from the beginning, the other only new messages. Exit after the first round of reads. Use classes and decorators to reduce nesting. Keep comments minimal, use print statements to indicate queue actions.
+  - Update all files to support a schema with an additional string field "scheduled_at" in the payload. Ensure nothing writes to the topic unless the schema is validated. Add/modify unit tests for payload structure. Use pytest and ruff for code quality checks.
+
+* Docker, Dev Containers, and Infra
+  - Create a Docker Compose file for {project}. Make the devcontainer.json reference the compose file instead of a Dockerfile. Ensure all services are on the same network "{network_name}". Assign each machine a hostname matching its entry name.
+  - Add a healthcheck to the Docker Compose service {service_name} that runs `{health_cmd}`. Show how to run a ping or wget command inside a running container to test connectivity to another service.
+
+* Redpanda, Benthos, and Connectors
+  - Configure Redpanda Connect to use a single http_client output with retry limits (max_retries: {n}, initial_interval: {x}s, max_interval: {y}s). Use a DLQ for failed messages. Lint the config with `rpk connect lint`. Make all HTTP headers mixed case. Use a simple string input for testing.
+  - Refactor the YAML config to deduplicate repeated broker entries. Move shared definitions (like seed_brokers) outside the output section. Flatten any output used only once back into its section.
+
+* TypeScript/NestJS/BullMQ
+  - Refactor the NestJS BullMQ setup so queue names are configurable via environment variables, not hardcoded enums. Decouple job type from queue name. Update @Processor and queue registration to use the config value. Ensure tests use a different queue name than production.
+  - Move the id attribute into the payload object. Add a delay field to the payload with a default of 30 seconds. When sending jobs, extract delay from the payload; if not defined, omit it. Update all related files and tests.
+  - Add controller methods to complement those in the service, e.g., a method to show only 'delayed' jobs. Add serialization interpreters as needed. Keep log messages visible in BullMQ output and UI.
+
+* General/DevOps/Automation
+  - Run all tests with pytest after sourcing the virtual environment. Run ruff on all Python files in the project root. Report any issues found.
+  - Validate the docker-compose or Redpanda YAML file for schema errors. Report any unrecognized fields or missing required fields. Suggest minimal changes to fix validation errors.
+
+* Org/Project Management
+  - Given a list of issues with IDs and titles, output an org-mode tree showing their hierarchical relationships. Add a summary of each issue's description under its entry.
+  - List all triage tasks in the {project_name} project in Linear. Show their status and any parent/child relationships in a tree format. 
