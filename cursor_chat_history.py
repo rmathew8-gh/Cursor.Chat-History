@@ -7,11 +7,13 @@ import sys
 import logging
 from typing import List, Optional, Dict, Any, Iterable
 from dataclasses import dataclass
+from datetime import datetime
 
 
 @dataclass(frozen=True)
 class Prompt:
     text: str
+    timestamp: Optional[datetime] = None
     # Add more fields if needed
 
 
@@ -55,16 +57,40 @@ class CursorChatHistoryExporter:
 
     @staticmethod
     def export_prompts_to_org(prompts: Iterable[Prompt], output_file: Path) -> None:
+        # Get the timestamp from the first prompt to set as file modification time
+        file_timestamp = None
+        for prompt in prompts:
+            if prompt.timestamp:
+                file_timestamp = prompt.timestamp
+                break
+        
         with open(output_file, "w", encoding="utf-8") as f:
-            f.writelines(f"* {prompt.text}\n" for prompt in prompts)
+            for prompt in prompts:
+                if prompt.timestamp:
+                    # Format timestamp for org mode: [YYYY-MM-DD Day HH:MM]
+                    timestamp_str = prompt.timestamp.strftime("[%Y-%m-%d %a %H:%M]")
+                    f.write(f"* {timestamp_str} {prompt.text}\n")
+                else:
+                    f.write(f"* {prompt.text}\n")
+        
+        # Set the file modification time to match the chat timestamp
+        if file_timestamp:
+            try:
+                import os
+                os.utime(output_file, (file_timestamp.timestamp(), file_timestamp.timestamp()))
+            except Exception as e:
+                logging.warning(f"Could not set file modification time for {output_file}: {e}")
 
     @staticmethod
-    def parse_prompts(raw_prompts: Any) -> Optional[List[Prompt]]:
+    def parse_prompts(raw_prompts: Any, file_timestamp: Optional[datetime] = None) -> Optional[List[Prompt]]:
         if isinstance(raw_prompts, list):
             # Use map and filter to process prompts
             return list(
                 map(
-                    lambda entry: Prompt(text=entry.get("text", "")),
+                    lambda entry: Prompt(
+                        text=entry.get("text", ""),
+                        timestamp=file_timestamp
+                    ),
                     filter(
                         lambda entry: isinstance(entry, dict) and "text" in entry,
                         raw_prompts,
@@ -91,7 +117,9 @@ class CursorChatHistoryExporter:
                 value = row[0]
                 try:
                     raw_prompts = json.loads(value)
-                    prompts = CursorChatHistoryExporter.parse_prompts(raw_prompts)
+                    # Get file modification timestamp
+                    file_timestamp = datetime.fromtimestamp(db_path.stat().st_mtime)
+                    prompts = CursorChatHistoryExporter.parse_prompts(raw_prompts, file_timestamp)
                     # Return as list of dicts for backward compatibility
                     return [prompt.__dict__ for prompt in prompts] if prompts else None
                 except Exception:

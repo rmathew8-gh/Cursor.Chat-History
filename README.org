@@ -52,8 +52,25 @@ python cursor_chat_history.py /path/to/state.vscdb
 Run the test suite with:
 
 #+BEGIN_SRC shell
-make test
+python3 run_tests.py
 #+END_SRC
+
+Or run individual tests:
+
+#+BEGIN_SRC shell
+python3 -c "from tests.test_cursor_chat_history import test_timestamp_formatting; test_timestamp_formatting()"
+#+END_SRC
+
+** Test Coverage
+
+The test suite covers:
+- Original functionality (prompt extraction)
+- New timestamp functionality
+- Backward compatibility
+- Error handling
+- File modification time setting
+- Org mode formatting
+- Mixed timestamp scenarios
 
 * Project Structure
 
@@ -63,17 +80,29 @@ make test
 
 * Example Output
 
-Each exported Org file will contain entries (your past prompts) like:
+Each exported Org file will contain entries (your past prompts) with timestamps like:
 
 #+BEGIN_EXAMPLE
-* What is the capital of France?
-* Summarize this article.
+* [2024-12-24 Tue 10:35] What is the capital of France?
+* [2024-12-24 Tue 10:35] Summarize this article.
 #+END_EXAMPLE
+
+** Timestamp Information
+
+The timestamps shown in the exported files represent the last modification time of the source database file. This provides a reasonable approximation of when the chat data was last updated, though it may not reflect the exact time of individual prompts.
+
+** Timestamp Format
+
+Timestamps are formatted as ~[YYYY-MM-DD Day HH:MM]~ where:
+- ~YYYY-MM-DD~ is the date
+- ~Day~ is the three-letter day abbreviation (Mon, Tue, etc.)
+- ~HH:MM~ is the time in 24-hour format
 
 * Troubleshooting
 
 - If you see errors about missing ~duckdb~, install it with ~uv pip install duckdb~.
 - If no files are exported, check that you have Cursor installed and have used it to generate workspace history.
+- If timestamps appear incorrect, they represent the file modification time of the database, not individual prompt times.
 
 * Contributing
 

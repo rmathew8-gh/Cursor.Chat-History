@@ -16,6 +16,10 @@ lint:
 test:
 	PYTHONPATH=. uv run pytest tests/
 
+# Run tests with custom test runner
+test-simple:
+	python3 run_tests.py
+
 # Clean up cache and export directories, and auto-fix lint
 clean:
 	rm -rf __pycache__ .ruff_cache chat_history_exports
