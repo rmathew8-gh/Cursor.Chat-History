@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [tool.uv]
-# uv-specific configuration can go here if needed
+link-mode = "hardlink"
 
 [tool.setuptools.packages.find]
 where = ["."]
