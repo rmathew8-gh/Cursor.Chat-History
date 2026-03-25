@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [tool.uv]
-link-mode = "hardlink"
+link-mode = "symlink"
 
 [tool.setuptools.packages.find]
 where = ["."]
